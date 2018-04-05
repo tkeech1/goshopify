@@ -66,7 +66,7 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		t.Logf("Running test case: %s", name, test)
+		t.Logf("Running test case: %s", name)
 		if test.Params["hmac"] == "REPLACE" {
 			test.Params["hmac"], _ = goshopify.CalculateHmac(test.Params, []byte(test.Secret))
 		}
@@ -145,7 +145,7 @@ func TestHandlerShopify_ValidateHmac(t *testing.T) {
 	}
 
 	for name, test := range tests {
-		t.Logf("Running test case: %s", name, test)
+		t.Logf("Running test case: %s", name)
 		response := goshopify.ValidateHmac(test.Params, []byte(test.Secret))
 		assert.Equal(t, test.Response, response)
 	}

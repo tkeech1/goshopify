@@ -1,4 +1,4 @@
-package shopify
+package goshopify
 
 type ShopifyInterface interface {
 	//Query(*dynamodb.QueryInput) (*dynamodb.QueryOutput, error)

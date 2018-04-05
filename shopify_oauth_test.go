@@ -1,4 +1,4 @@
-package shopify_test
+package goshopify_test
 
 import (
 	"strconv"
@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/tkeech1/shopify"
+	"github.com/tkeech1/goshopify"
 )
 
 // validate_params
@@ -68,9 +68,9 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 	for name, test := range tests {
 		t.Logf("Running test case: %s", name, test)
 		if test.Params["hmac"] == "REPLACE" {
-			test.Params["hmac"], _ = shopify.CalculateHmac(test.Params, []byte(test.Secret))
+			test.Params["hmac"], _ = goshopify.CalculateHmac(test.Params, []byte(test.Secret))
 		}
-		response := shopify.ValidateParams(test.Params, []byte(test.Secret))
+		response := goshopify.ValidateParams(test.Params, []byte(test.Secret))
 		assert.Equal(t, test.Response, response)
 	}
 }
@@ -146,7 +146,7 @@ func TestHandlerShopify_ValidateHmac(t *testing.T) {
 
 	for name, test := range tests {
 		t.Logf("Running test case: %s", name, test)
-		response := shopify.ValidateHmac(test.Params, []byte(test.Secret))
+		response := goshopify.ValidateHmac(test.Params, []byte(test.Secret))
 		assert.Equal(t, test.Response, response)
 	}
 }

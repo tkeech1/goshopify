@@ -42,6 +42,25 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 			},
 			Response: true,
 		},
+		"failure_no_timestamp": {
+			Secret: "hush",
+			Params: map[string]string{
+				"shop": "some-shop.myshopify.com",
+				"code": "a94a110d86d2452eb3e2af4cfb8a3828",
+				"hmac": "2cb1a277650a659f1b11e92a4a64275b128e037f2c3390e3c8fd2d8721dac9e2",
+			},
+			Response: false,
+		},
+		"failure_bad_timestamp": {
+			Secret: "hush",
+			Params: map[string]string{
+				"shop":      "some-shop.myshopify.com",
+				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
+				"timestamp": "13XXX37178173",
+				"hmac":      "2cb1a277650a659f1b11e92a4a64275b128e037f2c3390e3c8fd2d8721dac9e2",
+			},
+			Response: false,
+		},
 		"success_char_replacements": {
 			Secret: "hush",
 			Params: map[string]string{
@@ -118,16 +137,6 @@ func TestHandlerShopify_ValidateHmac(t *testing.T) {
 				"shop": "some-shop.myshopify.com",
 				"code": "a94a110d86d2452eb3e2af4cfb8a3828",
 				"hmac": "2cb1a277650a659f1b11e92a4a64275b128e037f2c3390e3c8fd2d8721dac9e2",
-			},
-			Response: false,
-		},
-		"failure_bad_timestamp": {
-			Secret: "hush",
-			Params: map[string]string{
-				"shop":      "some-shop.myshopify.com",
-				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
-				"timestamp": "13XXX37178173",
-				"hmac":      "2cb1a277650a659f1b11e92a4a64275b128e037f2c3390e3c8fd2d8721dac9e2",
 			},
 			Response: false,
 		},

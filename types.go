@@ -1,13 +1,18 @@
 package goshopify
 
-type ShopifyInterface interface {
-	//Query(*dynamodb.QueryInput) (*dynamodb.QueryOutput, error)
-	//PutItem(*dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error)
+import "net/http"
+
+type AccessToken struct {
+	AccessToken string `json:"access_token"`
+	Scope       string `json:"scope"`
+}
+
+type HttpRequestInterface interface {
+	Get(string) (*http.Response, error)
 }
 
 type Handler struct {
-	Svc     ShopifyInterface
-	Shopify ShopifyOauth
+	Req HttpRequestInterface
 }
 
 type ShopifyOauth struct {

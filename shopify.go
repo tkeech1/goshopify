@@ -4,13 +4,18 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"net/url"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func ValidateParams(params map[string]string, secret []byte) bool {
+func ValidateParams(params map[string]string, secret string) bool {
 
 	if _, ok := params["timestamp"]; !ok {
 		return false
@@ -29,7 +34,7 @@ func ValidateParams(params map[string]string, secret []byte) bool {
 	return ValidateHmac(params, secret)
 }
 
-func ValidateHmac(params map[string]string, secret []byte) bool {
+func ValidateHmac(params map[string]string, secret string) bool {
 	if _, ok := params["hmac"]; !ok {
 		return false
 	}
@@ -46,11 +51,11 @@ func ValidateHmac(params map[string]string, secret []byte) bool {
 	return false
 }
 
-func CalculateHmac(params map[string]string, secret []byte) (string, error) {
+func CalculateHmac(params map[string]string, secret string) (string, error) {
 
 	value := encodeParams(params)
 
-	mac := hmac.New(sha256.New, secret)
+	mac := hmac.New(sha256.New, []byte(secret))
 
 	_, err := mac.Write([]byte(value))
 	if err != nil {
@@ -79,4 +84,41 @@ func encodeParams(params map[string]string) string {
 		}
 	}
 	return s[:len(s)-1]
+}
+
+func (h *Handler) RequestToken(params map[string]string, secret string, apiKey string) (string, error) {
+	if !ValidateParams(params, secret) {
+		return "", errors.New("Error: Invalid HMAC")
+	}
+
+	resp, err := h.Req.Get(GetOauthUrl(params, apiKey, secret))
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(body))
+
+	var token AccessToken
+	err = json.Unmarshal(body, &token)
+	if err != nil {
+		return "", err
+	}
+
+	return token.AccessToken, nil
+}
+
+func GetOauthUrl(params map[string]string, apiKey string, secret string) string {
+	shopifyUrl := params["shop"] + "/oauth/access_token?"
+
+	v := url.Values{}
+	v.Set("client_id", apiKey)
+	v.Add("client_secret", string(secret))
+	v.Add("code", params["code"])
+
+	return ("https://" + shopifyUrl + v.Encode())
+}
+
+func (h *Handler) CreatePermissionUrl(scope string, redirectURI string, state string) string {
+	return ""
 }

@@ -1,17 +1,18 @@
 package goshopify_test
 
 import (
+	"bytes"
+	"errors"
+	"io/ioutil"
+	"net/http"
 	"strconv"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tkeech1/goshopify"
+	"github.com/tkeech1/goshopify/mocks"
 )
-
-// validate_params
-// request_token
-// create_permission_url
 
 func TestHandlerShopify_ValidateParams(t *testing.T) {
 
@@ -87,9 +88,9 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 	for name, test := range tests {
 		t.Logf("Running test case: %s", name)
 		if test.Params["hmac"] == "REPLACE" {
-			test.Params["hmac"], _ = goshopify.CalculateHmac(test.Params, []byte(test.Secret))
+			test.Params["hmac"], _ = goshopify.CalculateHmac(test.Params, test.Secret)
 		}
-		response := goshopify.ValidateParams(test.Params, []byte(test.Secret))
+		response := goshopify.ValidateParams(test.Params, test.Secret)
 		assert.Equal(t, test.Response, response)
 	}
 }
@@ -155,7 +156,96 @@ func TestHandlerShopify_ValidateHmac(t *testing.T) {
 
 	for name, test := range tests {
 		t.Logf("Running test case: %s", name)
-		response := goshopify.ValidateHmac(test.Params, []byte(test.Secret))
+		response := goshopify.ValidateHmac(test.Params, test.Secret)
 		assert.Equal(t, test.Response, response)
+	}
+}
+
+func TestHandlerShopify_RequestToken(t *testing.T) {
+
+	tests := map[string]struct {
+		Secret        string
+		ApiKey        string
+		Params        map[string]string
+		ReturnedToken string
+		Response      *http.Response
+		ResponseError error
+		err           error
+	}{
+		"success": {
+			Secret: "hush",
+			ApiKey: "someKey",
+			Params: map[string]string{
+				"shop":      "some-shop.myshopify.com",
+				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
+				"timestamp": strconv.FormatInt(time.Now().Unix(), 10),
+				"hmac":      "REPLACE",
+			},
+			Response: &http.Response{
+				StatusCode: 200,
+				Header: http.Header{
+					"Content-Type": {"application/json"},
+				},
+				Body: ioutil.NopCloser(bytes.NewReader([]byte(
+					`{"access_token": "12345","scope": "12345678"}`,
+				)))},
+			ResponseError: nil,
+			ReturnedToken: "12345",
+			err:           nil,
+		},
+		"failure_old_timestamp": {
+			Secret: "hush",
+			Params: map[string]string{
+				"shop":      "some-shop.myshopify.com",
+				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
+				"timestamp": "1337178173",
+				"hmac":      "2cb1a277650a659f1b11e92a4a64275b128e037f2c3390e3c8fd2d8721dac9e2",
+			},
+			ResponseError: nil,
+			ReturnedToken: "",
+			err:           errors.New("Error: Invalid HMAC"),
+		},
+		"failure_http_error": {
+			Secret: "hush",
+			ApiKey: "someKey",
+			Params: map[string]string{
+				"shop":      "some-shop.myshopify.com",
+				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
+				"timestamp": strconv.FormatInt(time.Now().Unix(), 10),
+				"hmac":      "REPLACE",
+			},
+			Response: &http.Response{
+				StatusCode: 200,
+				Header: http.Header{
+					"Content-Type": {"application/json"},
+				},
+				Body: ioutil.NopCloser(bytes.NewReader([]byte(
+					`{"access_token": "12345","scope": "12345678"}`,
+				)))},
+			ResponseError: errors.New("Error: HTTP"),
+			ReturnedToken: "",
+			err:           errors.New("Error: HTTP"),
+		},
+	}
+
+	for name, test := range tests {
+		t.Logf("Running test case: %s", name)
+		mockHttpRequestInterface := &mocks.HttpRequestInterface{}
+		mockHttpRequestInterface.
+			On("Get", goshopify.GetOauthUrl(test.Params, test.ApiKey, test.Secret)).
+			Return(test.Response, test.ResponseError).
+			Once()
+
+		h := &goshopify.Handler{
+			Req: mockHttpRequestInterface,
+		}
+
+		if test.Params["hmac"] == "REPLACE" {
+			test.Params["hmac"], _ = goshopify.CalculateHmac(test.Params, test.Secret)
+		}
+		response, err := h.RequestToken(test.Params, test.Secret, test.ApiKey)
+		assert.Equal(t, test.ReturnedToken, response)
+		assert.Equal(t, test.err, err)
+		//mockHttpRequestInterface.AssertExpectations(t)
 	}
 }

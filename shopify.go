@@ -113,7 +113,7 @@ func GetOauthUrl(params map[string]string, apiKey string, secret string) string 
 
 	v := url.Values{}
 	v.Set("client_id", apiKey)
-	v.Add("client_secret", string(secret))
+	v.Add("client_secret", secret)
 	v.Add("code", params["code"])
 
 	return ("https://" + shopifyUrl + v.Encode())
@@ -121,4 +121,15 @@ func GetOauthUrl(params map[string]string, apiKey string, secret string) string 
 
 func (h *Handler) CreatePermissionUrl(scope string, redirectURI string, state string) string {
 	return ""
+}
+
+func CreatePermissionUrl(apiKey string, scope string, redirectUrl string, state string, shopifyDomain string) string {
+	v := url.Values{}
+	v.Set("client_id", apiKey)
+	v.Add("scope", scope)
+	v.Add("redirect_uri", redirectUrl)
+	if state != "" {
+		v.Add("state", state)
+	}
+	return ("https://" + shopifyDomain + "/oauth/authorize?" + v.Encode())
 }

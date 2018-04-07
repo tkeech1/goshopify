@@ -249,3 +249,39 @@ func TestHandlerShopify_RequestToken(t *testing.T) {
 		//mockHttpRequestInterface.AssertExpectations(t)
 	}
 }
+
+func TestHandlerShopify_CreatePermissionUrl(t *testing.T) {
+
+	tests := map[string]struct {
+		ApiKey        string
+		Scope         string
+		State         string
+		RedirectUrl   string
+		ShopifyDomain string
+		Response      string
+	}{
+		"success": {
+			ApiKey:        "someKey",
+			Scope:         "scope1,scope2,scop3",
+			State:         "statestate",
+			RedirectUrl:   "https://myredirect",
+			ShopifyDomain: "mydomain.myshopify.com",
+			Response:      "https://mydomain.myshopify.com/oauth/authorize?client_id=someKey&redirect_uri=https%3A%2F%2Fmyredirect&scope=scope1%2Cscope2%2Cscop3&state=statestate",
+		},
+		"success_no_state": {
+			ApiKey:        "someKey",
+			Scope:         "scope1,scope2,scop3",
+			State:         "",
+			RedirectUrl:   "https://myredirect",
+			ShopifyDomain: "mydomain.myshopify.com",
+			Response:      "https://mydomain.myshopify.com/oauth/authorize?client_id=someKey&redirect_uri=https%3A%2F%2Fmyredirect&scope=scope1%2Cscope2%2Cscop3",
+		},
+	}
+
+	for name, test := range tests {
+		t.Logf("Running test case: %s", name)
+
+		response := goshopify.CreatePermissionUrl(test.ApiKey, test.Scope, test.RedirectUrl, test.State, test.ShopifyDomain)
+		assert.Equal(t, test.Response, response)
+	}
+}

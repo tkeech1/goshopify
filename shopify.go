@@ -127,5 +127,5 @@ func CreatePermissionUrl(apiKey string, scope string, redirectUrl string, state 
 	if state != "" {
 		v.Add("state", state)
 	}
-	return ("https://" + shopifyDomain + "/oauth/authorize?" + v.Encode())
+	return ("https://" + shopifyDomain + "/admin/oauth/authorize?" + v.Encode())
 }

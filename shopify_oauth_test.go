@@ -266,7 +266,7 @@ func TestHandlerShopify_CreatePermissionUrl(t *testing.T) {
 			State:         "statestate",
 			RedirectUrl:   "https://myredirect",
 			ShopifyDomain: "mydomain.myshopify.com",
-			Response:      "https://mydomain.myshopify.com/oauth/authorize?client_id=someKey&redirect_uri=https%3A%2F%2Fmyredirect&scope=scope1%2Cscope2%2Cscop3&state=statestate",
+			Response:      "https://mydomain.myshopify.com/admin/oauth/authorize?client_id=someKey&redirect_uri=https%3A%2F%2Fmyredirect&scope=scope1%2Cscope2%2Cscop3&state=statestate",
 		},
 		"success_no_state": {
 			ApiKey:        "someKey",
@@ -274,7 +274,7 @@ func TestHandlerShopify_CreatePermissionUrl(t *testing.T) {
 			State:         "",
 			RedirectUrl:   "https://myredirect",
 			ShopifyDomain: "mydomain.myshopify.com",
-			Response:      "https://mydomain.myshopify.com/oauth/authorize?client_id=someKey&redirect_uri=https%3A%2F%2Fmyredirect&scope=scope1%2Cscope2%2Cscop3",
+			Response:      "https://mydomain.myshopify.com/admin/oauth/authorize?client_id=someKey&redirect_uri=https%3A%2F%2Fmyredirect&scope=scope1%2Cscope2%2Cscop3",
 		},
 	}
 

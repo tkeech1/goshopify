@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/url"
 	"sort"
@@ -86,7 +85,7 @@ func encodeParams(params map[string]string) string {
 	return s[:len(s)-1]
 }
 
-func (h *Handler) RequestToken(params map[string]string, secret string, apiKey string) (string, error) {
+func (h *HttpRequestHandler) RequestToken(params map[string]string, secret string, apiKey string) (string, error) {
 	if !ValidateParams(params, secret) {
 		return "", errors.New("Error: Invalid HMAC")
 	}
@@ -97,7 +96,6 @@ func (h *Handler) RequestToken(params map[string]string, secret string, apiKey s
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
 
 	var token AccessToken
 	err = json.Unmarshal(body, &token)

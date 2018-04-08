@@ -236,7 +236,7 @@ func TestHandlerShopify_RequestToken(t *testing.T) {
 			Return(test.Response, test.ResponseError).
 			Once()
 
-		h := &goshopify.Handler{
+		h := &goshopify.HttpRequestHandler{
 			Req: mockHttpRequestInterface,
 		}
 

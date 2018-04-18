@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"sort"
@@ -93,14 +94,22 @@ func (h *HttpRequestHandler) RequestToken(params map[string]string, secret strin
 
 	resp, err := h.Req.Get(GetOauthUrl(params, apiKey, secret))
 	if err != nil {
+		log.Print("Get", err)
 		return "", err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Print("ReadAll", err)
+		return "", err
+	}
+
+	log.Print("Body ", body)
 
 	var token AccessToken
 	err = json.Unmarshal(body, &token)
 	if err != nil {
+		log.Print("Unmarshal", err)
 		return "", err
 	}
 

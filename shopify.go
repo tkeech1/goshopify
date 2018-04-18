@@ -104,10 +104,10 @@ func (h *HttpRequestHandler) RequestToken(params map[string]string, secret strin
 		return "", err
 	}
 
-	log.Print("Body ", body)
+	log.Print("Body ", string(body))
 
 	var token AccessToken
-	err = json.Unmarshal(body, &token)
+	err = json.Unmarshal([]byte(body), &token)
 	if err != nil {
 		log.Print("Unmarshal", err)
 		return "", err

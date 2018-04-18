@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"net/http"
 	"net/url"
 	"sort"
 	"strconv"
@@ -126,4 +127,8 @@ func CreatePermissionUrl(apiKey string, scope string, redirectUrl string, state 
 		v.Add("state", state)
 	}
 	return ("https://" + shopifyDomain + "/admin/oauth/authorize?" + v.Encode())
+}
+
+func (h *HttpRequestHandler) Get(s string) (*http.Response, error) {
+	return http.Get(s)
 }

@@ -117,7 +117,7 @@ func (h *HttpRequestHandler) RequestToken(params map[string]string, secret strin
 }
 
 func GetOauthUrl(params map[string]string, apiKey string, secret string) string {
-	shopifyUrl := params["shop"] + "/oauth/access_token?"
+	shopifyUrl := params["shop"] + "/admin/oauth/access_token?"
 
 	v := url.Values{}
 	v.Set("client_id", apiKey)

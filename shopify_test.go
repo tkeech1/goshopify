@@ -18,12 +18,14 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 
 	tests := map[string]struct {
 		Secret   string
+		ApiKey   string
 		Params   map[string]string
 		Response bool
 		err      error
 	}{
 		"success_new_timestamp": {
 			Secret: "hush",
+			ApiKey: "apikey",
 			Params: map[string]string{
 				"shop":      "some-shop.myshopify.com",
 				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
@@ -34,6 +36,7 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 		},
 		"success_new_params": {
 			Secret: "hush",
+			ApiKey: "apikey",
 			Params: map[string]string{
 				"shop":      "some-shop.myshopify.com",
 				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
@@ -45,6 +48,7 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 		},
 		"failure_no_timestamp": {
 			Secret: "hush",
+			ApiKey: "apikey",
 			Params: map[string]string{
 				"shop": "some-shop.myshopify.com",
 				"code": "a94a110d86d2452eb3e2af4cfb8a3828",
@@ -54,6 +58,7 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 		},
 		"failure_bad_timestamp": {
 			Secret: "hush",
+			ApiKey: "apikey",
 			Params: map[string]string{
 				"shop":      "some-shop.myshopify.com",
 				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
@@ -64,6 +69,7 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 		},
 		"success_char_replacements": {
 			Secret: "hush",
+			ApiKey: "apikey",
 			Params: map[string]string{
 				"shop":      "some-shop.myshopify.com",
 				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
@@ -75,6 +81,7 @@ func TestHandlerShopify_ValidateParams(t *testing.T) {
 		},
 		"failure_old_timestamp": {
 			Secret: "hush",
+			ApiKey: "apikey",
 			Params: map[string]string{
 				"shop":      "some-shop.myshopify.com",
 				"code":      "a94a110d86d2452eb3e2af4cfb8a3828",
@@ -232,7 +239,7 @@ func TestHandlerShopify_RequestToken(t *testing.T) {
 		t.Logf("Running test case: %s", name)
 		mockHttpRequestInterface := &mocks.HttpRequestInterface{}
 		mockHttpRequestInterface.
-			On("Get", goshopify.GetOauthUrl(test.Params, test.ApiKey, test.Secret)).
+			On("Post", "https://"+test.Params["shop"]+"/admin/oauth/access_token", test.ApiKey, test.Secret, test.Params["code"]).
 			Return(test.Response, test.ResponseError).
 			Once()
 

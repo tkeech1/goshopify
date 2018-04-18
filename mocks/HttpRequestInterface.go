@@ -31,3 +31,26 @@ func (_m *HttpRequestInterface) Get(_a0 string) (*http.Response, error) {
 
 	return r0, r1
 }
+
+// Post provides a mock function with given fields: _a0, _a1, _a2, _a3
+func (_m *HttpRequestInterface) Post(_a0 string, _a1 string, _a2 string, _a3 string) (*http.Response, error) {
+	ret := _m.Called(_a0, _a1, _a2, _a3)
+
+	var r0 *http.Response
+	if rf, ok := ret.Get(0).(func(string, string, string, string) *http.Response); ok {
+		r0 = rf(_a0, _a1, _a2, _a3)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*http.Response)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string, string, string, string) error); ok {
+		r1 = rf(_a0, _a1, _a2, _a3)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

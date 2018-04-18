@@ -93,33 +93,19 @@ func (h *HttpRequestHandler) RequestToken(params map[string]string, secret strin
 		return "", errors.New("Error: Invalid HMAC")
 	}
 
-	data := url.Values{
-		"client_id":     {apiKey},
-		"client_secret": {secret},
-		"code":          {params["code"]},
-	}
-
-	bodydata := bytes.NewBufferString(data.Encode())
-
-	//resp, err := h.Req.Get(GetOauthUrl(params, apiKey, secret))
-	resp, err := http.Post("https://"+params["shop"]+"/admin/oauth/access_token", "application/x-www-form-urlencoded", bodydata)
+	resp, err := h.Req.Post("https://"+params["shop"]+"/admin/oauth/access_token", apiKey, secret, params["code"])
 	if err != nil {
-		log.Print("Get", err)
 		return "", err
 	}
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Print("ReadAll", err)
 		return "", err
 	}
-
-	log.Print("Body ", string(body))
 
 	var token AccessToken
 	err = json.Unmarshal([]byte(body), &token)
 	if err != nil {
-		log.Print("Unmarshal", err)
 		return "", err
 	}
 
@@ -154,4 +140,14 @@ func CreatePermissionUrl(apiKey string, scope string, redirectUrl string, state 
 
 func (h *HttpRequestHandler) Get(s string) (*http.Response, error) {
 	return http.Get(s)
+}
+
+func (h *HttpRequestHandler) Post(urlAddress string, apiKey string, secret string, code string) (*http.Response, error) {
+	data := url.Values{
+		"client_id":     {apiKey},
+		"client_secret": {secret},
+		"code":          {code},
+	}
+	bodydata := bytes.NewBufferString(data.Encode())
+	return http.Post(urlAddress, "application/x-www-form-urlencoded", bodydata)
 }

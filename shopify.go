@@ -1,6 +1,7 @@
 package goshopify
 
 import (
+	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -92,7 +93,16 @@ func (h *HttpRequestHandler) RequestToken(params map[string]string, secret strin
 		return "", errors.New("Error: Invalid HMAC")
 	}
 
-	resp, err := h.Req.Get(GetOauthUrl(params, apiKey, secret))
+	data := url.Values{
+		"client_id":     {apiKey},
+		"client_secret": {secret},
+		"code":          {params["code"]},
+	}
+
+	bodydata := bytes.NewBufferString(data.Encode())
+
+	//resp, err := h.Req.Get(GetOauthUrl(params, apiKey, secret))
+	resp, err := http.Post("https://"+params["shop"]+"/admin/oauth/access_token", "application/x-www-form-urlencoded", bodydata)
 	if err != nil {
 		log.Print("Get", err)
 		return "", err

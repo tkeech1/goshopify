@@ -262,7 +262,7 @@ func TestHandlerShopify_RequestToken(t *testing.T) {
 	}
 }
 
-/*func TestHandlerShopify_CreatePermissionUrl(t *testing.T) {
+func TestHandlerShopify_CreatePermissionUrl(t *testing.T) {
 
 	tests := map[string]struct {
 		ApiKey        string
@@ -296,4 +296,4 @@ func TestHandlerShopify_RequestToken(t *testing.T) {
 		response := goshopify.CreatePermissionUrl(test.ApiKey, test.Scope, test.RedirectUrl, test.State, test.ShopifyDomain)
 		assert.Equal(t, test.Response, response)
 	}
-}*/
+}

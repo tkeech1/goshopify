@@ -138,16 +138,13 @@ func CreatePermissionUrl(apiKey string, scope string, redirectUrl string, state 
 	return ("https://" + shopifyDomain + "/admin/oauth/authorize?" + v.Encode())
 }
 
-func (h *HttpRequestHandler) Get(s string) (*http.Response, error) {
-	return http.Get(s)
-}
-
-func (h *HttpRequestHandler) Post(urlAddress string, apiKey string, secret string, code string) (*http.Response, error) {
-	data := url.Values{
+func (h *HttpRequestHandler) Post(urlAddress string, data url.Values) (*http.Response, error) {
+	//apiKey string, secret string, code string) (*http.Response, error) {
+	/*data := url.Values{
 		"client_id":     {apiKey},
 		"client_secret": {secret},
 		"code":          {code},
-	}
+	}*/
 	bodydata := bytes.NewBufferString(data.Encode())
 	return http.Post(urlAddress, "application/x-www-form-urlencoded", bodydata)
 }

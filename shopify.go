@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"sort"
@@ -117,28 +116,7 @@ func (h *HttpRequestHandler) RequestToken(params map[string]string, secret strin
 	return token.AccessToken, nil
 }
 
-func GetOauthUrl(params map[string]string, apiKey string, secret string) string {
-	shopifyUrl := params["shop"] + "/admin/oauth/access_token?"
-
-	v := url.Values{}
-	v.Set("client_id", apiKey)
-	v.Add("client_secret", secret)
-	v.Add("code", params["code"])
-
-	url := "https://" + shopifyUrl + v.Encode()
-
-	log.Print("URL: ", url)
-
-	return (url)
-}
-
 func (h *HttpRequestHandler) Post(urlAddress string, data url.Values) (*http.Response, error) {
-	//apiKey string, secret string, code string) (*http.Response, error) {
-	/*data := url.Values{
-		"client_id":     {apiKey},
-		"client_secret": {secret},
-		"code":          {code},
-	}*/
 	bodydata := bytes.NewBufferString(data.Encode())
 	return http.Post(urlAddress, "application/x-www-form-urlencoded", bodydata)
 }

@@ -116,6 +116,17 @@ func (h *HttpRequestHandler) RequestToken(params map[string]string, secret strin
 	return token.AccessToken, nil
 }
 
+func CreatePermissionUrl(apiKey string, scope string, redirectUrl string, state string, shopifyDomain string) string {
+	v := url.Values{}
+	v.Set("client_id", apiKey)
+	v.Add("scope", scope)
+	v.Add("redirect_uri", redirectUrl)
+	if state != "" {
+		v.Add("state", state)
+	}
+	return ("https://" + shopifyDomain + "/admin/oauth/authorize?" + v.Encode())
+}
+
 func (h *HttpRequestHandler) Post(urlAddress string, data url.Values) (*http.Response, error) {
 	bodydata := bytes.NewBufferString(data.Encode())
 	return http.Post(urlAddress, "application/x-www-form-urlencoded", bodydata)
